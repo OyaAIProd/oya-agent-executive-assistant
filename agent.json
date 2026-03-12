@@ -1,0 +1,123 @@
+{
+  "agent_id": "9a771624-7eba-47c6-b0e8-d804654ad84e",
+  "name": "Executive Assistant",
+  "mode": "skills",
+  "deploy_status": "draft",
+  "chat_model": null,
+  "system_prompt": "",
+  "scratchpad": "",
+  "soul": {
+    "persona": "",
+    "brand": {},
+    "behavior_rules": [],
+    "welcome_message": ""
+  },
+  "skills": [
+    {
+      "skill_id": "memory",
+      "name": "Agent Memory",
+      "description": "Remember and recall facts about users and context across conversations, and manage your persistent scratchpad/brain",
+      "skill_type": "tool",
+      "category": "general",
+      "catalog_type": "core",
+      "config": {}
+    },
+    {
+      "skill_id": "rest-api",
+      "name": "REST API Call",
+      "description": "Make HTTP requests to external APIs \u2014 GET, POST, PUT, PATCH, DELETE",
+      "skill_type": "tool",
+      "category": "general",
+      "catalog_type": "core",
+      "config": {}
+    },
+    {
+      "skill_id": "search-kb",
+      "name": "Knowledge Base",
+      "description": "Search the agent's uploaded documents and knowledge base",
+      "skill_type": "tool",
+      "category": "general",
+      "catalog_type": "core",
+      "config": {}
+    },
+    {
+      "skill_id": "text-to-speech",
+      "name": "Text to Speech",
+      "description": "Convert text to speech audio file using gTTS (free, no API key needed)",
+      "skill_type": "sandbox",
+      "category": "voice",
+      "catalog_type": "core",
+      "config": {}
+    },
+    {
+      "skill_id": "web-search",
+      "name": "Web Search",
+      "description": "Search the web for current information, news, and answers",
+      "skill_type": "tool",
+      "category": "general",
+      "catalog_type": "core",
+      "config": {}
+    }
+  ],
+  "gateways": [],
+  "routines": [
+    {
+      "name": "Morning Executive Brief",
+      "description": "",
+      "schedule_human": "0 7 * * 1-5",
+      "schedule_cron": "0 7 * * 1-5",
+      "prompt": "Generate the morning executive brief and send it to Slack.\n\n1. Check Gmail for all unread emails since yesterday 5pm:\n   - Count total unread\n   - Identify urgent items using the urgency framework from your knowledge base\n   - Summarize the top 10 most important emails (who, subject, what they need)\n   - Draft replies for any that you can handle\n\n2. Check today's Google Calendar:\n   - List all meetings with times, attendees, and any prep needed\n   - Flag any conflicts or back-to-back meetings without buffers\n   - Note any meetings that need prep materials from Drive\n\n3. Check memory for any pending action items or follow-ups due today\n\n4. Send the brief to Slack in this format:\n   ---\n   MORNING BRIEF \u2014 [date]\n\n   URGENT (needs attention now):\n   \u2022 [items, if any \u2014 or \"Nothing urgent\"]\n\n   TODAY'S CALENDAR:\n   \u2022 [time] \u2014 [meeting] with [people] | [prep needed]\n\n   EMAIL SUMMARY ([count] unread):\n   \u2022 [sender]: [subject] \u2014 [what they need]\n\n   ACTION ITEMS DUE TODAY:\n   \u2022 [items from tracking sheet]\n\n   DRAFTED REPLIES (ready for your approval):\n   \u2022 Re: [subject] \u2014 [summary of draft]\n   ---\n\n5. Save what you reported to memory so you don't re-notify about the same items.\n",
+      "output_channel": "",
+      "is_active": true
+    },
+    {
+      "name": "Midday Email Check",
+      "description": "",
+      "schedule_human": "0 12 * * 1-5",
+      "schedule_cron": "0 12 * * 1-5",
+      "prompt": "Quick midday email triage \u2014 check Gmail for new emails since 7am.\n\nOnly alert on Slack if there's something urgent per the urgency framework.\nFor urgent items, send a brief Slack message:\n\"URGENT: [who] \u2014 [what] \u2014 [action needed]\"\n\nFor non-urgent items, save a summary to memory for the afternoon brief.\nCheck memory first to avoid re-notifying about items already covered in the morning brief.\n",
+      "output_channel": "",
+      "is_active": true
+    },
+    {
+      "name": "Pre-Meeting Prep",
+      "description": "",
+      "schedule_human": "*/30 8-17 * * 1-5",
+      "schedule_cron": "*/30 8-17 * * 1-5",
+      "prompt": "Check Google Calendar for any meetings starting in the next 30 minutes.\n\nIf there's a meeting coming up:\n1. Look up the attendees (check memory and recent emails for context)\n2. Search Google Drive for any relevant docs, decks, or shared files\n3. Check if there are related email threads that provide context\n4. Send a Slack message 15 minutes before:\n   \"Meeting in 15 min: [title] with [people]\n   Context: [1-2 sentence summary]\n   Docs: [links if any]\n   Last interaction: [brief note from memory/email]\"\n\nIf no meetings coming up, do nothing. Don't send \"no meetings\" messages.\nCheck memory to avoid sending duplicate prep for the same meeting.\n",
+      "output_channel": "",
+      "is_active": true
+    },
+    {
+      "name": "Afternoon Recap",
+      "description": "",
+      "schedule_human": "0 17 * * 1-5",
+      "schedule_cron": "0 17 * * 1-5",
+      "prompt": "Generate the afternoon recap and send to Slack.\n\n1. Check Gmail for emails received since the midday check (12pm)\n2. Review today's completed meetings \u2014 note any action items mentioned\n3. Check memory for items noted during the day but not yet reported\n4. Update the action items Google Sheet with any new items from today\n\nSend to Slack:\n---\nAFTERNOON RECAP \u2014 [date]\n\nNEW SINCE MORNING:\n\u2022 [new emails/items that need attention]\n\nTODAY'S ACTION ITEMS (new):\n\u2022 [items captured from meetings and emails today]\n\nPENDING RESPONSES:\n\u2022 [emails still awaiting reply, with age]\n\nTOMORROW PREVIEW:\n\u2022 [first 3 meetings from tomorrow's calendar]\n---\n\nSave the recap to memory so tomorrow's morning brief can reference it.\n",
+      "output_channel": "",
+      "is_active": true
+    },
+    {
+      "name": "Weekly Calendar Review",
+      "description": "",
+      "schedule_human": "0 18 * * 0",
+      "schedule_cron": "0 18 * * 0",
+      "prompt": "Sunday evening \u2014 prepare the week ahead overview.\n\n1. Pull next week's Google Calendar (Monday through Friday)\n2. Identify potential conflicts, overloaded days, or missing buffers\n3. Check for any meetings that need prep materials\n4. Review the action items sheet for overdue items\n5. Check LinkedIn and X for any pending messages or mentions from the past week\n\nSend to Slack:\n---\nWEEK AHEAD \u2014 [date range]\n\nMEETING LOAD:\n\u2022 Mon: [count] meetings ([hours] total)\n\u2022 Tue: [count] meetings ([hours] total)\n\u2022 Wed: [count] meetings ([hours] total)\n\u2022 Thu: [count] meetings ([hours] total)\n\u2022 Fri: [count] meetings ([hours] total)\n\nHEADS UP:\n\u2022 [conflicts, heavy days, prep needed]\n\nOVERDUE ACTION ITEMS:\n\u2022 [items past due date]\n\nSOCIAL UPDATES:\n\u2022 LinkedIn: [pending messages/mentions]\n\u2022 X: [pending mentions/DMs]\n---\n",
+      "output_channel": "",
+      "is_active": true
+    }
+  ],
+  "triggers": [],
+  "mcp_connections": [],
+  "memories": [],
+  "knowledge_base": [
+    {
+      "folder_name": "Agent Knowledge Base",
+      "filename": "executive-handbook.md",
+      "mime_type": "application/octet-stream",
+      "file_size": 2094,
+      "summary": ""
+    }
+  ],
+  "tools_config": {}
+}
